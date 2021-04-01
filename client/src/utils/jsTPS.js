@@ -23,6 +23,26 @@ export class UpdateListField_Transaction extends jsTPS_Transaction {
     }
 }
 
+/* Handles list item sorting, replace the current one with selected one */
+export class SortItems_Transaction extends jsTPS_Transaction {
+    constructor(_id, prev, update, callback){
+        super();
+        this._id = _id;
+        this.prev = prev;
+        this.update = update;
+        this.updateFunction = callback;
+    }
+
+    async doTransaction(){
+        const { data } = await this.updateFunction({ variables: {_id: this._id, value: this.update }});
+        return data;
+    }
+    async undoTransaction(){
+        const { data } = await this.updateFunction({ variables: {_id: this._id, value: this.prev }});
+        return data;
+    }
+}
+
 /*  Handles item reordering */
 export class ReorderItems_Transaction extends jsTPS_Transaction {
     constructor(listID, itemID, dir, callback) {

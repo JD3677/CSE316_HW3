@@ -163,6 +163,18 @@ module.exports = {
 			listItems = found.items;
 			return (found.items);
 
+		},
+
+		/**
+			@param 	 {object} args - contains list id, item to swap, and swap direction
+			@returns {array} the reordered item array on success, or initial ordering on failure
+		**/
+		sortItems: async (_, args) => {
+			const { _id, value} = args;
+			const listId = new ObjectId(_id);
+			const updated = await Todolist.updateOne({_id: listId}, { items: Array(value)[0] })
+			if(updated) return true;
+			else return false;
 		}
 
 	}

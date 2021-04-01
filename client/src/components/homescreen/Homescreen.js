@@ -14,7 +14,8 @@ import { WLayout, WLHeader, WLMain, WLSide } from 'wt-frontend';
 import { UpdateListField_Transaction, 
 	UpdateListItems_Transaction, 
 	ReorderItems_Transaction, 
-	EditItem_Transaction } 				from '../../utils/jsTPS';
+	EditItem_Transaction, 
+	SortItems_Transaction} 				from '../../utils/jsTPS';
 import WInput from 'wt-frontend/build/components/winput/WInput';
 
 
@@ -33,6 +34,7 @@ const Homescreen = (props) => {
 	const [DeleteTodoItem] 			= useMutation(mutations.DELETE_ITEM);
 	const [AddTodolist] 			= useMutation(mutations.ADD_TODOLIST);
 	const [AddTodoItem] 			= useMutation(mutations.ADD_ITEM);
+	const [SortItems]				= useMutation(mutations.SORT_ITEMS);
 
 
 	const { loading, error, data, refetch } = useQuery(GET_DB_TODOS);
@@ -128,6 +130,7 @@ const Homescreen = (props) => {
 	};
 
 	const createNewList = async () => {
+		props.tps.clearAllTransactions();
 		const length = todolists.length
 		const id = length >= 1 ? todolists[length - 1].id + Math.floor((Math.random() * 100) + 1) : 1;
 		let list = {
@@ -142,6 +145,7 @@ const Homescreen = (props) => {
 	};
 
 	const deleteList = async (_id) => {
+		props.tps.clearAllTransactions();
 		DeleteTodolist({ variables: { _id: _id }, refetchQueries: [{ query: GET_DB_TODOS }] });
 		refetch();
 		setActiveList({});
@@ -154,7 +158,152 @@ const Homescreen = (props) => {
 
 	};
 
+	const toList = (update) => {
+		let updateList = [];
+		for(let i = 0; i< update.length; i++){
+			let up = {
+				_id: update[i]._id,
+				id: update[i].id,
+				description: update[i].description,
+				due_date: update[i].due_date,
+				assigned_to: update[i].assigned_to,
+				completed: update[i].completed
+			};
+			updateList.push(up);
+		}
+		return updateList;
+	}
+
+	const sortItemByDescription = async () => {
+		if(activeList._id === undefined)return;
+		let prev = [...activeList.items];
+		let update = [...activeList.items];
+		let compare = [...activeList.items];
+		compare.sort(function(a,b){
+			var A = a.description.toUpperCase();
+			var B = b.description.toUpperCase();
+			if (A < B) {return -1;}
+			if (A > B) {return 1;}
+			  return 0;
+			  });
+
+		if(compareLists(update, compare)){
+			update.sort(function(a,b){
+				var A = a.description.toUpperCase();
+				var B = b.description.toUpperCase();
+				if (A < B) {return 1;}
+				if (A > B) {return -1;}
+				  return 0;
+				  });
+		}else{
+			update = compare;
+		}
+
+		let transaction = new SortItems_Transaction(activeList._id, toList(prev), toList(update), SortItems);
+		props.tps.addTransaction(transaction);
+		tpsRedo();
+	};
+
+	const sortItemByDue = async () => {
+		if(activeList._id === undefined)return;
+		let prev = [...activeList.items];
+		let update = [...activeList.items];
+		let compare = [...activeList.items];
+		compare.sort(function(a,b){
+			var A = a.due_date.toUpperCase();
+			var B = b.due_date.toUpperCase();
+			if (A < B) {return -1;}
+			if (A > B) {return 1;}
+			  return 0;
+			  });
+
+		if(compareLists(update, compare)){
+			update.sort(function(a,b){
+				var A = a.due_date.toUpperCase();
+				var B = b.due_date.toUpperCase();
+				if (A < B) {return 1;}
+				if (A > B) {return -1;}
+				  return 0;
+				  });
+			}else{
+				update = compare;
+			}
+		
+			let transaction = new SortItems_Transaction(activeList._id, toList(prev), toList(update), SortItems);
+			props.tps.addTransaction(transaction);
+			tpsRedo();
+	};
+
+	const sortItemByAssgin = async () => {
+		if(activeList._id === undefined)return;
+		let prev = [...activeList.items];
+		let update = [...activeList.items];
+		let compare = [...activeList.items];
+		compare.sort(function(a,b){
+			var A = a.assigned_to.toUpperCase();
+			var B = b.assigned_to.toUpperCase();
+			if (A < B) {return -1;}
+			if (A > B) {return 1;}
+			  return 0;
+			  });
+
+		if(compareLists(update, compare)){
+			update.sort(function(a,b){
+				var A = a.assigned_to.toUpperCase();
+				var B = b.assigned_to.toUpperCase();
+				if (A < B) {return 1;}
+				if (A > B) {return -1;}
+					return 0;
+					});
+			}else{
+				update = compare;
+			}
+
+			let transaction = new SortItems_Transaction(activeList._id, toList(prev), toList(update), SortItems);
+			props.tps.addTransaction(transaction);
+			tpsRedo();
+	};
+
+	const sortItemByStatus = async() => {
+		if(activeList._id === undefined)return;
+		let prev = [...activeList.items];
+		let update = [...activeList.items];
+		let compare = [...activeList.items];
+		compare.sort(function(a,b){
+			var A = a.completed;
+			var B = b.completed;
+			if (A < B) {return -1;}
+			if (A > B) {return 1;}
+			  return 0;
+			  });
+
+		if(compareLists(update, compare)){
+			update.sort(function(a,b){
+				var A = a.completed;
+				var B = b.completed;
+				if (A < B) {return 1;}
+				if (A > B) {return -1;}
+					return 0;
+				});
+			}else{
+				update = compare;
+			}
+		
+		let transaction = new SortItems_Transaction(activeList._id, toList(prev), toList(update), SortItems);
+		props.tps.addTransaction(transaction);
+		tpsRedo();
+		
+	};
+
+	const compareLists = (a, b) => {
+		for(let i = 0; i < a.length; i++){
+			if(a[i]._id != b[i]._id){return false}
+		}
+		return true;
+	};
+
 	const handleSetActive = (id) => {
+		props.tps.clearAllTransactions();
 		const todo = todolists.find(todo => todo.id === id || todo._id === id);
 		setActiveList(todo);
 	};
@@ -226,6 +375,11 @@ const Homescreen = (props) => {
 									editItem={editItem} reorderItem={reorderItem}
 									setShowDelete={setShowDelete}
 									activeList={activeList} setActiveList={setActiveList}
+									sortItemByDescription={sortItemByDescription}
+									sortItemByDue = {sortItemByDue}
+									sortItemByAssgin = {sortItemByAssgin}
+									sortItemByStatus = {sortItemByStatus}
+
 								/>
 							</div>
 						:
