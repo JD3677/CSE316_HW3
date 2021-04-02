@@ -5,7 +5,11 @@ import { WButton, WRow, WCol } from 'wt-frontend';
 const TableHeader = (props) => {
 
     const buttonStyle = props.disabled ? ' table-header-button-disabled ' : 'table-header-button ';
-    const clickDisabled = () => { };
+    const clickDisabled = () => {};
+    const handleCloseList = () => {
+        props.activeAdd();
+        props.setActiveList({});
+    }
 
     return (
         <WRow className="table-header">
@@ -27,12 +31,13 @@ const TableHeader = (props) => {
 
             <WCol size="3">
                 <div className = "button-group">
-                    <WButton className="sidebar-buttons undo-redo" onClick={props.undo} wType="texted" clickAnimation="ripple-light" shape="rounded">
-                            <i className="material-icons">undo</i>
+                    <WButton className="sidebar-buttons undo-redo" onClick={props.undo} wType="texted" shape="rounded">
+                            <i className="material-icons" id = "undo">undo</i>
                     </WButton>
-                    <WButton className="sidebar-buttons undo-redo" onClick={props.redo} wType="texted" clickAnimation="ripple-light" shape="rounded">
-                            <i className="material-icons">redo</i>
+                    <WButton className="sidebar-buttons undo-redo" onClick={props.redo} wType="texted" shape="rounded">
+                            <i className="material-icons" id = "redo">redo</i>
                     </WButton>
+                    
                     <div className="table-header-buttons">
                         <WButton onClick={props.disabled ? clickDisabled : props.addItem} wType="texted" className={`${buttonStyle}`}>
                             <i className="material-icons">add_box</i>
@@ -40,7 +45,7 @@ const TableHeader = (props) => {
                         <WButton onClick={props.disabled ? clickDisabled : props.setShowDelete} wType="texted" className={`${buttonStyle}`}>
                             <i className="material-icons">delete_outline</i>
                         </WButton>
-                        <WButton onClick={props.disabled ? clickDisabled : () => props.setActiveList({})} wType="texted" className={`${buttonStyle}`}>
+                        <WButton onClick={props.disabled ? clickDisabled : handleCloseList} wType="texted" className={`${buttonStyle}`}>
                             <i className="material-icons">close</i>
                         </WButton>
                     </div>

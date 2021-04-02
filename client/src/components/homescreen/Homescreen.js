@@ -26,6 +26,7 @@ const Homescreen = (props) => {
 	const [showDelete, toggleShowDelete] 	= useState(false);
 	const [showLogin, toggleShowLogin] 		= useState(false);
 	const [showCreate, toggleShowCreate] 	= useState(false);
+	const [activeAdd, setActiveAdd]			= useState(true);
 
 	const [ReorderTodoItems] 		= useMutation(mutations.REORDER_ITEMS);
 	const [UpdateTodoItemField] 	= useMutation(mutations.UPDATE_ITEM_FIELD);
@@ -61,16 +62,54 @@ const Homescreen = (props) => {
 	const tpsUndo = async () => {
 		const retVal = await props.tps.undoTransaction();
 		refetchTodos(refetch);
+
+		if(props.tps.hasTransactionToUndo()){
+			document.getElementById("undo").style.color = "white";
+		}else{
+			document.getElementById("undo").style.color = "#322d2d";
+		}
+
+		if(props.tps.hasTransactionToRedo()){
+			document.getElementById("redo").style.color = "white";
+		}else{
+			document.getElementById("redo").style.color = "#322d2d";
+		}
+		handleArrow();
 		return retVal;
 	}
 
 	const tpsRedo = async () => {
 		const retVal = await props.tps.doTransaction();
 		refetchTodos(refetch);
+
+		if(props.tps.hasTransactionToUndo()){
+			document.getElementById("undo").style.color = "white";
+		}else{
+			document.getElementById("undo").style.color = "#322d2d";
+		}
+
+		if(props.tps.hasTransactionToRedo()){
+			document.getElementById("redo").style.color = "white";
+		}else{
+			document.getElementById("redo").style.color = "#322d2d";
+		}
+		handleArrow();
 		return retVal;
 	}
 
+	const handleArrow = () => {
+		setTimeout(function(){if(document.getElementsByClassName("table-entry-buttons").length == 0)return;},2)
+		setTimeout(
+			function(){
+				for(let i = 0; i < document.getElementsByClassName("table-entry-buttons").length; i++){
+					document.getElementsByClassName("table-entry-buttons")[i].style.color = "white";
+				}
+			},2
+		);
 
+		setTimeout(function(){ document.getElementsByClassName("table-entry-buttons")[0].style.color = "#353a44"; }, 300);
+		setTimeout(function(){ document.getElementsByClassName("table-entry-buttons")[document.getElementsByClassName("table-entry-buttons").length - 2].style.color = "#353a44"; }, 300);
+	}
 	// Creates a default item and passes it to the backend resolver.
 	// The return id is assigned to the item, and the item is appended
 	//  to the local cache copy of the active todolist. 
@@ -92,6 +131,7 @@ const Homescreen = (props) => {
 		let transaction = new UpdateListItems_Transaction(listID, itemID, newItem, opcode, AddTodoItem, DeleteTodoItem);
 		props.tps.addTransaction(transaction);
 		tpsRedo();
+		handleArrow();
 	};
 
 
@@ -110,6 +150,7 @@ const Homescreen = (props) => {
 		let transaction = new UpdateListItems_Transaction(listID, itemID, itemToDelete, opcode, AddTodoItem, DeleteTodoItem);
 		props.tps.addTransaction(transaction);
 		tpsRedo();
+		handleArrow();
 	};
 
 	const editItem = async (itemID, field, value, prev) => {
@@ -119,15 +160,17 @@ const Homescreen = (props) => {
 		let transaction = new EditItem_Transaction(listID, itemID, field, prev, value, flag, UpdateTodoItemField);
 		props.tps.addTransaction(transaction);
 		tpsRedo();
-
+		handleArrow();
 	};
 
 	const reorderItem = async (itemID, dir) => {
 		let listID = activeList._id;
+		if(dir == -1 && itemID == activeList.items[0]._id) return;
+		if(dir == 1 && itemID == activeList.items[activeList.items.length - 1]._id) return;
 		let transaction = new ReorderItems_Transaction(listID, itemID, dir, ReorderTodoItems);
 		props.tps.addTransaction(transaction);
 		tpsRedo();
-
+		handleArrow();
 	};
 
 	const createNewList = async () => {
@@ -143,7 +186,7 @@ const Homescreen = (props) => {
 		}
 		const { data } = await AddTodolist({ variables: { todolist: list }, refetchQueries: [{ query: GET_DB_TODOS }] });
 		setTimeout(function(){ refetchTodos(refetch); }, 300);
-		setTimeout(function(){ setActiveList({}); }, 400);
+		setTimeout(function(){ setActiveList({}); handleAcitveAddList(); }, 400);
 	};
 
 	const deleteList = async (_id) => {
@@ -151,13 +194,14 @@ const Homescreen = (props) => {
 		DeleteTodolist({ variables: { _id: _id }, refetchQueries: [{ query: GET_DB_TODOS }] });
 		refetch();
 		setActiveList({});
+		handleAcitveAddList();
 	};
 
 	const updateListField = async (_id, field, value, prev) => {
 		let transaction = new UpdateListField_Transaction(_id, field, prev, value, UpdateTodolistField);
 		props.tps.addTransaction(transaction);
 		tpsRedo();
-
+		handleArrow();
 	};
 
 	const toList = (update) => {
@@ -305,8 +349,13 @@ const Homescreen = (props) => {
 	};
 
 	const handleSetActive = (id) => {
+		handleDeactiveAddList();
 		props.tps.clearAllTransactions();
-		let temp = [...todolists];
+		const todo = todolists.find(todo => todo.id === id || todo._id === id);
+		setActiveList(todo);
+		handleArrow();
+
+		/**let temp = [...todolists];
 		let targetPos = 0;
 		let target;
 		for(let i = 0; i < temp.length; i++){
@@ -332,11 +381,18 @@ const Homescreen = (props) => {
 			final.push(up);
 		}
 
-		SortTodos({ variables: { todolists: final }});
-
-		const todo = todolists.find(todo => todo.id === id || todo._id === id);
-		setActiveList(todo);
+		SortTodos({ variables: { todolists: final }}); */
 	};
+
+	const handleAcitveAddList = () => {
+		setActiveAdd(true);
+		document.getElementById("addListButton").style.backgroundColor = "#ffc800";
+	}
+
+	const handleDeactiveAddList = () => {
+		setActiveAdd(false);
+		document.getElementById("addListButton").style.backgroundColor = "#353a44";
+	}
 
 	
 	/*
@@ -388,7 +444,7 @@ const Homescreen = (props) => {
 							<SidebarContents
 								todolists={todolists} activeid={activeList.id} auth={auth}
 								handleSetActive={handleSetActive} createNewList={createNewList}
-								updateListField={updateListField}
+								updateListField={updateListField} activeAdd = {activeAdd}
 							/>
 							:
 							<></>
@@ -409,6 +465,7 @@ const Homescreen = (props) => {
 									sortItemByAssgin = {sortItemByAssgin}
 									sortItemByStatus = {sortItemByStatus}
 									undo={tpsUndo} redo={tpsRedo}
+									activeAdd = {handleAcitveAddList}
 
 								/>
 							</div>

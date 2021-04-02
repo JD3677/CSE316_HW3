@@ -6,7 +6,7 @@ const SidebarContents = (props) => {
     return (
         <>
             <SidebarHeader 
-                auth={props.auth} createNewList={props.createNewList} 
+                auth={props.auth} createNewList={props.createNewList} activeAdd = {props.activeAdd}
             />
             <SidebarList
                 activeid={props.activeid} handleSetActive={props.handleSetActive}
