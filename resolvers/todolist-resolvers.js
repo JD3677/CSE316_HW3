@@ -175,6 +175,9 @@ module.exports = {
 			const updated = await Todolist.updateOne({_id: listId}, { items: Array(value)[0] })
 			if(updated) return true;
 			else return false;
+		},
+
+		sortTodolists: async (_, args) => {
 		}
 
 	}

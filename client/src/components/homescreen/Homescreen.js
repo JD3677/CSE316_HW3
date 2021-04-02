@@ -35,6 +35,7 @@ const Homescreen = (props) => {
 	const [AddTodolist] 			= useMutation(mutations.ADD_TODOLIST);
 	const [AddTodoItem] 			= useMutation(mutations.ADD_ITEM);
 	const [SortItems]				= useMutation(mutations.SORT_ITEMS);
+	const [SortTodos]				= useMutation(mutations.SORT_TODOS);
 
 
 	const { loading, error, data, refetch } = useQuery(GET_DB_TODOS);
@@ -141,7 +142,8 @@ const Homescreen = (props) => {
 			items: [],
 		}
 		const { data } = await AddTodolist({ variables: { todolist: list }, refetchQueries: [{ query: GET_DB_TODOS }] });
-		setActiveList(list)
+		setTimeout(function(){ refetchTodos(refetch); }, 300);
+		setTimeout(function(){ setActiveList({}); }, 400);
 	};
 
 	const deleteList = async (_id) => {
@@ -304,6 +306,34 @@ const Homescreen = (props) => {
 
 	const handleSetActive = (id) => {
 		props.tps.clearAllTransactions();
+		let temp = [...todolists];
+		let targetPos = 0;
+		let target;
+		for(let i = 0; i < temp.length; i++){
+			if(temp[i].id === id){
+				target = temp[i];
+				targetPos = i;
+				break;
+			}
+		}
+
+		temp.splice(targetPos,1);
+		temp.unshift(target);
+		
+		let final = [];
+		for(let i = 0; i< temp.length; i++){
+			let up = {
+				_id: temp[i]._id,
+				id: temp[i].id,
+				name: temp[i].name,
+				owner: temp[i].owner,
+				items: toList(temp[i].items)
+			};
+			final.push(up);
+		}
+
+		SortTodos({ variables: { todolists: final }});
+
 		const todo = todolists.find(todo => todo.id === id || todo._id === id);
 		setActiveList(todo);
 	};
