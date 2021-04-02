@@ -12,6 +12,7 @@ const MainContents = (props) => {
                 sortItemByDue = {props.sortItemByDue}
                 sortItemByAssgin = {props.sortItemByAssgin}
                 sortItemByStatus = {props.sortItemByStatus}
+                undo={props.undo} redo={props.redo}
             />
             <TableContents
                 key={props.activeList.id} activeList={props.activeList}

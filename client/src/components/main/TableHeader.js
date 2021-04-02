@@ -26,16 +26,24 @@ const TableHeader = (props) => {
             </WCol>
 
             <WCol size="3">
-                <div className="table-header-buttons">
-                    <WButton onClick={props.disabled ? clickDisabled : props.addItem} wType="texted" className={`${buttonStyle}`}>
-                        <i className="material-icons">add_box</i>
+                <div className = "button-group">
+                    <WButton className="sidebar-buttons undo-redo" onClick={props.undo} wType="texted" clickAnimation="ripple-light" shape="rounded">
+                            <i className="material-icons">undo</i>
                     </WButton>
-                    <WButton onClick={props.disabled ? clickDisabled : props.setShowDelete} wType="texted" className={`${buttonStyle}`}>
-                        <i className="material-icons">delete_outline</i>
+                    <WButton className="sidebar-buttons undo-redo" onClick={props.redo} wType="texted" clickAnimation="ripple-light" shape="rounded">
+                            <i className="material-icons">redo</i>
                     </WButton>
-                    <WButton onClick={props.disabled ? clickDisabled : () => props.setActiveList({})} wType="texted" className={`${buttonStyle}`}>
-                        <i className="material-icons">close</i>
-                    </WButton>
+                    <div className="table-header-buttons">
+                        <WButton onClick={props.disabled ? clickDisabled : props.addItem} wType="texted" className={`${buttonStyle}`}>
+                            <i className="material-icons">add_box</i>
+                        </WButton>
+                        <WButton onClick={props.disabled ? clickDisabled : props.setShowDelete} wType="texted" className={`${buttonStyle}`}>
+                            <i className="material-icons">delete_outline</i>
+                        </WButton>
+                        <WButton onClick={props.disabled ? clickDisabled : () => props.setActiveList({})} wType="texted" className={`${buttonStyle}`}>
+                            <i className="material-icons">close</i>
+                        </WButton>
+                    </div>
                 </div>
             </WCol>
 
