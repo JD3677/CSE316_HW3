@@ -98,17 +98,21 @@ const Homescreen = (props) => {
 	}
 
 	const handleArrow = () => {
-		setTimeout(function(){if(document.getElementsByClassName("table-entry-buttons").length == 0)return;},2)
-		setTimeout(
+		let a = setTimeout(
 			function(){
 				for(let i = 0; i < document.getElementsByClassName("table-entry-buttons").length; i++){
 					document.getElementsByClassName("table-entry-buttons")[i].style.color = "white";
 				}
-			},2
+			},150
 		);
 
-		setTimeout(function(){ document.getElementsByClassName("table-entry-buttons")[0].style.color = "#353a44"; }, 300);
-		setTimeout(function(){ document.getElementsByClassName("table-entry-buttons")[document.getElementsByClassName("table-entry-buttons").length - 2].style.color = "#353a44"; }, 300);
+		let b = setTimeout(function(){ document.getElementsByClassName("table-entry-buttons")[0].style.color = "#353a44"; }, 200);
+		let c = setTimeout(function(){ document.getElementsByClassName("table-entry-buttons")[document.getElementsByClassName("table-entry-buttons").length - 2].style.color = "#353a44"; }, 200);
+		setTimeout(function(){if(document.getElementsByClassName("table-entry-buttons").length == 0){
+			clearTimeout(a);
+			clearTimeout(b);
+			clearTimeout(c);
+		}},100)
 	}
 	// Creates a default item and passes it to the backend resolver.
 	// The return id is assigned to the item, and the item is appended
@@ -131,7 +135,6 @@ const Homescreen = (props) => {
 		let transaction = new UpdateListItems_Transaction(listID, itemID, newItem, opcode, AddTodoItem, DeleteTodoItem);
 		props.tps.addTransaction(transaction);
 		tpsRedo();
-		handleArrow();
 	};
 
 
@@ -150,7 +153,6 @@ const Homescreen = (props) => {
 		let transaction = new UpdateListItems_Transaction(listID, itemID, itemToDelete, opcode, AddTodoItem, DeleteTodoItem);
 		props.tps.addTransaction(transaction);
 		tpsRedo();
-		handleArrow();
 	};
 
 	const editItem = async (itemID, field, value, prev) => {
@@ -160,7 +162,6 @@ const Homescreen = (props) => {
 		let transaction = new EditItem_Transaction(listID, itemID, field, prev, value, flag, UpdateTodoItemField);
 		props.tps.addTransaction(transaction);
 		tpsRedo();
-		handleArrow();
 	};
 
 	const reorderItem = async (itemID, dir) => {
@@ -170,7 +171,6 @@ const Homescreen = (props) => {
 		let transaction = new ReorderItems_Transaction(listID, itemID, dir, ReorderTodoItems);
 		props.tps.addTransaction(transaction);
 		tpsRedo();
-		handleArrow();
 	};
 
 	const createNewList = async () => {
