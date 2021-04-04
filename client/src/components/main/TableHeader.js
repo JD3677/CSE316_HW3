@@ -9,6 +9,9 @@ const TableHeader = (props) => {
     const handleCloseList = () => {
         props.activeAdd();
         props.setActiveList({});
+        for(let i = 0; i < document.getElementsByClassName("list-item").length; i++){
+			document.getElementsByClassName("list-item")[i].style.color = "white";
+		}
     }
 
     return (

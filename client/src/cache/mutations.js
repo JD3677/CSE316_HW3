@@ -97,9 +97,3 @@ export const SORT_ITEMS = gql`
 		sortItems(_id: $_id, value: $value)
 	}
 `;
-
-export const SORT_TODOS = gql`
-	mutation SortTodolists($todolists: [TodoInput]!){
-		sortTodolists(todolists: $todolists)
-	}
-`;

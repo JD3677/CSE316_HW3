@@ -36,7 +36,6 @@ const Homescreen = (props) => {
 	const [AddTodolist] 			= useMutation(mutations.ADD_TODOLIST);
 	const [AddTodoItem] 			= useMutation(mutations.ADD_ITEM);
 	const [SortItems]				= useMutation(mutations.SORT_ITEMS);
-	const [SortTodos]				= useMutation(mutations.SORT_TODOS);
 
 
 	const { loading, error, data, refetch } = useQuery(GET_DB_TODOS);
@@ -351,37 +350,23 @@ const Homescreen = (props) => {
 	const handleSetActive = (id) => {
 		handleDeactiveAddList();
 		props.tps.clearAllTransactions();
-		const todo = todolists.find(todo => todo.id === id || todo._id === id);
-		setActiveList(todo);
-		handleArrow();
 
-		/**let temp = [...todolists];
-		let targetPos = 0;
-		let target;
-		for(let i = 0; i < temp.length; i++){
+		for(let i = 0; i < document.getElementsByClassName("list-item").length; i++){
+			document.getElementsByClassName("list-item")[i].style.color = "white";
+		}
+
+		let temp = [...todolists];
+		let targetPos = 0;for(let i = 0; i < temp.length; i++){
 			if(temp[i].id === id){
-				target = temp[i];
 				targetPos = i;
 				break;
 			}
 		}
-
-		temp.splice(targetPos,1);
-		temp.unshift(target);
+		document.getElementsByClassName("list-item")[targetPos].style.color = "#ffc800";
 		
-		let final = [];
-		for(let i = 0; i< temp.length; i++){
-			let up = {
-				_id: temp[i]._id,
-				id: temp[i].id,
-				name: temp[i].name,
-				owner: temp[i].owner,
-				items: toList(temp[i].items)
-			};
-			final.push(up);
-		}
-
-		SortTodos({ variables: { todolists: final }}); */
+		const todo = todolists.find(todo => todo.id === id || todo._id === id);
+		setActiveList(todo);
+		handleArrow();
 	};
 
 	const handleAcitveAddList = () => {
