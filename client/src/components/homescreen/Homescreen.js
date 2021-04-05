@@ -97,21 +97,24 @@ const Homescreen = (props) => {
 	}
 
 	const handleArrow = () => {
-		let a = setTimeout(
-			function(){
-				for(let i = 0; i < document.getElementsByClassName("table-entry-buttons").length; i++){
-					document.getElementsByClassName("table-entry-buttons")[i].style.color = "white";
-				}
-			},150
-		);
-
-		let b = setTimeout(function(){ document.getElementsByClassName("table-entry-buttons")[0].style.color = "#353a44"; }, 200);
-		let c = setTimeout(function(){ document.getElementsByClassName("table-entry-buttons")[document.getElementsByClassName("table-entry-buttons").length - 2].style.color = "#353a44"; }, 200);
-		setTimeout(function(){if(document.getElementsByClassName("table-entry-buttons").length == 0){
-			clearTimeout(a);
-			clearTimeout(b);
-			clearTimeout(c);
-		}},100)
+		try{
+			let a = setTimeout(
+				function(){
+					for(let i = 0; i < document.getElementsByClassName("table-entry-buttons").length; i++){
+						document.getElementsByClassName("table-entry-buttons")[i].style.color = "white";
+					}
+				},150
+			);
+	
+			let b = setTimeout(function(){ document.getElementsByClassName("table-entry-buttons")[0].style.color = "#353a44"; }, 200);
+			let c = setTimeout(function(){ document.getElementsByClassName("table-entry-buttons")[document.getElementsByClassName("table-entry-buttons").length - 2].style.color = "#353a44"; }, 200);
+			setTimeout(function(){if(document.getElementsByClassName("table-entry-buttons").length == 0){
+				clearTimeout(a);
+				clearTimeout(b);
+				clearTimeout(c);
+			}},100)
+		}catch(Exception){}
+		
 	}
 	// Creates a default item and passes it to the backend resolver.
 	// The return id is assigned to the item, and the item is appended
