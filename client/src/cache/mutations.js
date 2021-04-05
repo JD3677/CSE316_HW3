@@ -30,9 +30,9 @@ export const LOGOUT = gql`
 `;
 
 export const ADD_ITEM = gql`
-	mutation AddItem($item: ItemInput!, $_id: String!) {
-		addItem(item: $item, _id: $_id)
-	}
+	mutation AddItem($item: ItemInput!, $_id: String!, $index: Int!) {
+		addItem(item: $item, _id: $_id, index: $index)
+   }
 `;
 
 export const DELETE_ITEM = gql`
